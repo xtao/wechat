@@ -108,7 +108,7 @@ class PKCS7Encoder():
         if amount_to_pad == 0:
             amount_to_pad = self.block_size
         # 获得补位所用的字符
-        pad = chr(amount_to_pad)
+        pad = bytes([amount_to_pad])
         return text + pad * amount_to_pad
 
     def decode(self, decrypted):
@@ -138,7 +138,8 @@ class Prpcrypt(object):
         @return: 加密得到的字符串
         """
         # 16位随机字符串添加到明文开头
-        text = self.get_random_str() + str(struct.pack("I", socket.htonl(len(text))), 'utf-8') + text + appid
+        text = bytes(text, 'utf-8')
+        text = bytes(self.get_random_str(), 'utf-8') + struct.pack("I", socket.htonl(len(text))) + text + bytes(appid, 'utf-8')
         # 使用自定义的填充方式对明文进行补位填充
         pkcs7 = PKCS7Encoder()
         text = pkcs7.encode(text)
